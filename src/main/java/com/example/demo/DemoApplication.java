@@ -1,14 +1,32 @@
-package com.example.demo;
+/*
+Enoncé
+* http://prodageo.insa-rouen.fr/wiki/pmwiki.php?n=CASI.EXA3415
+
+Mode opératoire
+* Pour lancer l'application (en mode console dans un terminal), executer la commande suivante (dite commande A)
+** > mvn -q spring-boot:run
+** l'option -q (comme ''quiet'') permet de ne pas afficher les traces maven.
+* Pour lancer l'application dans sa configuration de production, lancer la commande suivante (commande B) :
+** > mvn -q spring-boot:run -Dspring.profiles.active=prod
+                                                                                                         
+*/
+
+
+ package com.example.demo;
+
 
 import org.springframework.boot.SpringApplication;
+
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.Banner; // to limit the useless output that pollute the expected output
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.Banner; // to limit the useless output that pollute the expected output
 
 // source :
-// // https://www.baeldung.com/spring-boot-console-appa
+// https://www.baeldung.com/spring-boot-console-appa
 // https://www.mkyong.com/spring-boot/spring-boot-non-web-application-example/
 // https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#boot-features-command-line-runner
 
@@ -16,7 +34,7 @@ import org.springframework.boot.Banner; // to limit the useless output that poll
 public class DemoApplication
   implements CommandLineRunner {
  
-    // private static Logger LOG = LoggerFactory.getLogger(SpringBootConsoleApplication.class);
+    private static Logger LOG = LoggerFactory.getLogger(DemoApplication.class);
 	private CalculatriceRemote calcGeneric ;
 	
 	@Autowired
@@ -31,84 +49,45 @@ public class DemoApplication
 	@Autowired
 	private CalculatriceJetableBean calcJetableLocale ;
 
-	// Question B - uncomment the DemoApplication  constructor
+	@Autowired
+	private CalculatriceJetableBean calcAinitialiser ;
+
+	@Autowired
+	private DelayMaker the_delay_maker ;
+	
 	public DemoApplication ( @Qualifier("jetable") CalculatriceRemote aCalc )
 	{
         System.out.println( "Hello World" );
 		calcGeneric = aCalc ;
 		System.out.println( calcGeneric.whatsyourname() ) ;
-		
 	}
 	
     public static void main(String[] args) {
         // LOG.info("STARTING THE APPLICATION");
-                SpringApplication app = new SpringApplication(DemoApplication.class);
-                app.setBannerMode(Banner.Mode.OFF);
-                app.run( args );
-				// LOG.info("APPLICATION FINISHED");
+		SpringApplication app = new SpringApplication(DemoApplication.class);
+		app.setBannerMode(Banner.Mode.OFF);
+		app.run( args );
+		// LOG.info("APPLICATION FINISHED");
     }
-  
-    // injection par setter - mais comment sait-il qu'il faut faire par setter ?
-	
-  
-  
+
     @Override
     public void run(String... args) {
 
-	// LOG.info("EXECUTING : command line runner");
+	LOG.info("EXECUTING : command line runner");
 		System.out.println( calcMemoire.whatsyourname() ) ;
+		int the_time = the_delay_maker.wait_for_a_moment() ;
+		System.out.println( "Delai : " + the_time ) ;
+		
 		System.out.println( calcJetable.whatsyourname() ) ;
  
 		System.out.println( calcMemoireLocale.whatsyourname() ) ;
 		System.out.println( calcJetableLocale.whatsyourname() ) ;
 
-
- /*
-        for (int i = 0; i < args.length; ++i) {
-            LOG.info("args[{}]: {}", i, args[i]);
-        }
-        */
-
+		if ( calcAinitialiser != null )
+		{ System.out.println ( calcAinitialiser.whatsyourname() ) ; }
+	
+		else
+		{ System.out.println ( "calcAinitialiser est null" ) ; }
 
     }
-
-// https://www.mkyong.com/spring/spring-bean-scopes-examples/ : prototype versus singleton
-
-/*
-@SpringBootApplication
-public class DemoApplication {
-
-	public static void main(String[] args) {
-		SpringApplication.run(DemoApplication.class, args);
-		// return "Greetings from Spring Boot!";
-	}
-
-        public void run(String... args) {
-          System.out.println( "Hello World" );
-    }
-*/
-
-/*
-
-// https://www.boraji.com/spring-singleton-scope-example-using-scope-annotation
-
-public class MainApp {
-   public static void main(String[] args) {
-      AnnotationConfigApplicationContext context = 
-            new AnnotationConfigApplicationContext(AppConfig.class);
-
-      AccountService service1 = context.getBean("accountService", AccountService.class);
-      service1.setAccountHolder("BORAJI");
-      System.out.println(service1.getAccountHolder());
-
-      AccountService service2 = context.getBean("accountService", AccountService.class);
-      System.out.println(service2.getAccountHolder());
-      context.close();
-   }
-}
-
-*/
-
-
-
-}
+  }
