@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Profile;
 
 // https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#boot-features-command-line-runner
 @Component
-@Scope("prototype") // @Scope("singleton")
+@Scope("prototype")
 @Qualifier("memoire")
 public class CalculatriceMemoireBean implements CalculatriceRemote {
 
